@@ -1,12 +1,11 @@
 import { test, expect } from "@playwright/test";
-test("invalid login verification", async ({ page }) => {
-  await page.goto("https://www.saucedemo.com/");
-  await page.locator("#user-name").fill("invalid_user");
-  await page.locator("#password").fill("wrong_password");
-  await expect(page.locator("#user-name")).toHaveValue("invalid_user");
-  await expect(page.locator("#password")).toHaveValue("wrong_password");
+import { LoginPage } from "../pages/LoginPage.js";
 
-  await page.getByRole("button", { name: "Login" }).click();
+test("invalid login verification", async ({ page }) => {
+  const loginPage = new LoginPage(page);
+
+  await loginPage.open();
+  await loginPage.login("invalid_user", "wrong_password");
 
   await expect(page.locator('[data-test="error"]')).toBeVisible();
   await expect(page.locator('[data-test="error"]')).toHaveText(

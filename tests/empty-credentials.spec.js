@@ -1,10 +1,11 @@
 import { test, expect } from "@playwright/test";
-test("invalid login verification", async ({ page }) => {
-  await page.goto("https://www.saucedemo.com/");
-  await expect(page.locator("#user-name")).toHaveValue("");
-  await expect(page.locator("#password")).toHaveValue("");
+import { LoginPage } from "../pages/LoginPage.js";
 
-  await page.getByRole("button", { name: "Login" }).click();
+test("Login with Empty Credentials", async ({ page }) => {
+  const loginPage = new LoginPage(page);
+
+  await loginPage.open();
+  await loginPage.login("", "");
 
   const errorMessage = page.locator('[data-test="error"]');
   await expect(errorMessage).toBeVisible();

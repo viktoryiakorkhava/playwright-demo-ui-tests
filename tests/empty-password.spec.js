@@ -1,12 +1,11 @@
 import { test, expect } from "@playwright/test";
+import { LoginPage } from "../pages/LoginPage.js";
 
 test("login with empty password", async ({ page }) => {
-  await page.goto("https://www.saucedemo.com/");
-  await page.locator("#user-name").fill("standard_user");
-  await expect(page.locator("#user-name")).toHaveValue("standard_user");
-  await expect(page.locator("#password")).toHaveValue("");
+  const loginPage = new LoginPage(page);
 
-  await page.getByRole("button", { name: "Login" }).click();
+  await loginPage.open();
+  await loginPage.login("standard_user", "");
 
   const errorMessage = page.locator('[data-test="error"]');
   await expect(errorMessage).toBeVisible();
