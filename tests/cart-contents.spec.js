@@ -1,0 +1,37 @@
+import { test, expect } from "@playwright/test";
+
+test("Verify Shopping Cart Contents", async ({ page }) => {
+  await page.goto("https://www.saucedemo.com/");
+  await page.locator("#user-name").fill("standard_user");
+  await page.locator("#password").fill("secret_sauce");
+  await expect(page.locator("#user-name")).toHaveValue("standard_user");
+  await expect(page.locator("#password")).toHaveValue("secret_sauce");
+
+  await page.getByRole("button", { name: "Login" }).click();
+
+  await expect(page).toHaveURL("https://www.saucedemo.com/inventory.html");
+  await expect(page.locator('[data-test="title"]')).toBeVisible();
+  await expect(page.locator('[data-test="title"]')).toHaveText("Products");
+  await expect(
+    page.getByText("Sauce Labs Backpack", { exact: true }),
+  ).toBeVisible();
+
+  await page.locator('[data-test="add-to-cart-sauce-labs-backpack"]').click();
+
+  const shoppingCartBadge = page.locator(".shopping_cart_badge");
+  await expect(shoppingCartBadge).toBeVisible();
+  await expect(shoppingCartBadge).toHaveText("1");
+
+  await shoppingCartBadge.click();
+
+  await expect(page).toHaveURL("https://www.saucedemo.com/cart.html");
+  await expect(page.locator('[data-test="title"]')).toHaveText("Your Cart");
+  await expect(
+    page.getByText("Sauce Labs Backpack", { exact: true }),
+  ).toBeVisible();
+  await expect(page.locator('[data-test="item-quantity"]')).toHaveText("1");
+  await expect(page.locator('[data-test="inventory-item-price"]')).toHaveText(
+    "$29.99",
+  );
+  await expect(page.getByRole("button", { name: "Remove" })).toBeVisible();
+});

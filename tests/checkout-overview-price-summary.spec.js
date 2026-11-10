@@ -1,0 +1,102 @@
+import { test, expect } from "@playwright/test";
+
+test("Verify Checkout Overview Price Summary", async ({ page }) => {
+  await page.goto("https://www.saucedemo.com/");
+  await page.locator("#user-name").fill("standard_user");
+  await page.locator("#password").fill("secret_sauce");
+  await expect(page.locator("#user-name")).toHaveValue("standard_user");
+  await expect(page.locator("#password")).toHaveValue("secret_sauce");
+
+  await page.getByRole("button", { name: "Login" }).click();
+
+  await expect(page).toHaveURL("https://www.saucedemo.com/inventory.html");
+  await expect(page.locator('[data-test="title"]')).toBeVisible();
+  await expect(page.locator('[data-test="title"]')).toHaveText("Products");
+  await expect(
+    page.getByText("Sauce Labs Backpack", { exact: true }),
+  ).toBeVisible();
+
+  await page.locator('[data-test="add-to-cart-sauce-labs-backpack"]').click();
+
+  const shoppingCartBadge = page.locator(".shopping_cart_badge");
+  await expect(shoppingCartBadge).toBeVisible();
+  await expect(shoppingCartBadge).toHaveText("1");
+
+  await shoppingCartBadge.click();
+
+  await expect(page).toHaveURL("https://www.saucedemo.com/cart.html");
+  await expect(page.locator('[data-test="title"]')).toHaveText("Your Cart");
+
+  await expect(
+    page.getByText("Sauce Labs Backpack", { exact: true }),
+  ).toBeVisible();
+
+  await expect(page.locator("#checkout")).toBeVisible();
+  await page.locator("#checkout").click();
+
+  await expect(page).toHaveURL(
+    "https://www.saucedemo.com/checkout-step-one.html",
+  );
+  await expect(page.locator('[data-test="title"]')).toBeVisible();
+  await expect(page.locator('[data-test="title"]')).toHaveText(
+    "Checkout: Your Information",
+  );
+  await expect(page.locator("#first-name")).toBeVisible();
+  await page.locator("#first-name").fill("John");
+  await expect(page.locator("#first-name")).toHaveValue("John");
+  await expect(page.locator("#last-name")).toBeVisible();
+  await page.locator("#last-name").fill("Smith");
+  await expect(page.locator("#last-name")).toHaveValue("Smith");
+  await expect(page.locator("#postal-code")).toBeVisible();
+  await page.locator("#postal-code").fill("12345");
+  await expect(page.locator("#postal-code")).toHaveValue("12345");
+
+  await expect(page.getByRole("button", { name: "Continue" })).toBeVisible();
+  await page.getByRole("button", { name: "Continue" }).click();
+  await expect(page).toHaveURL(
+    "https://www.saucedemo.com/checkout-step-two.html",
+  );
+  await expect(page.locator('[data-test="title"]')).toBeVisible();
+  await expect(page.locator('[data-test="title"]')).toHaveText(
+    "Checkout: Overview",
+  );
+  await expect(
+    page.getByText("Sauce Labs Backpack", { exact: true }),
+  ).toBeVisible();
+
+  await expect(page.locator('[data-test="inventory-item-desc"]')).toHaveText(
+    "carry.allTheThings() with the sleek, streamlined Sly Pack that melds uncompromising style with unequaled laptop and tablet protection.",
+  );
+  await expect(page.locator('[data-test="item-quantity"]')).toHaveText("1");
+  await expect(page.locator('[data-test="inventory-item-price"]')).toHaveText(
+    "$29.99",
+  );
+  await expect(page.locator('[data-test="subtotal-label"]')).toHaveText(
+    "Item total: $29.99",
+  );
+  await expect(page.locator('[data-test="tax-label"]')).toHaveText(
+    "Tax: $2.40",
+  );
+  await expect(page.locator('[data-test="total-label"]')).toHaveText(
+    "Total: $32.39",
+  );
+
+  const subtotalText = await page
+    .locator(".summary_subtotal_label")
+    .textContent();
+  const taxText = await page.locator(".summary_tax_label").textContent();
+  const totalText = await page.locator(".summary_total_label").textContent();
+
+  const subtotal = parseFloat(subtotalText.split("$")[1]);
+  const tax = parseFloat(taxText.split("$")[1]);
+  const total = parseFloat(totalText.split("$")[1]);
+
+  const subtotalCents = Math.round(subtotal * 100);
+  const taxCents = Math.round(tax * 100);
+  const totalCents = Math.round(total * 100);
+
+  expect(subtotalCents + taxCents).toBe(totalCents);
+
+  await expect(page.getByRole("button", { name: "Finish" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Cancel" })).toBeVisible();
+});
