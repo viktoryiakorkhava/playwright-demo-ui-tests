@@ -1,17 +1,14 @@
 import { test, expect } from "@playwright/test";
+import { LoginPage } from "../pages/LoginPage.js";
 
 test("Successful User Logout", async ({ page }) => {
-  await page.goto("https://www.saucedemo.com/");
-
   const usernameInput = page.locator("#user-name");
   const passwordInput = page.locator("#password");
 
-  await usernameInput.fill("standard_user");
-  await passwordInput.fill("secret_sauce");
-  await expect(usernameInput).toHaveValue("standard_user");
-  await expect(passwordInput).toHaveValue("secret_sauce");
+  const loginPage = new LoginPage(page);
 
-  await page.getByRole("button", { name: "Login" }).click();
+  await loginPage.open();
+  await loginPage.login("standard_user", "secret_sauce");
 
   await expect(page).toHaveURL("https://www.saucedemo.com/inventory.html");
   await expect(page.locator('[data-test="title"]')).toBeVisible();

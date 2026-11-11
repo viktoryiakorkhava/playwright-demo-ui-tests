@@ -1,13 +1,12 @@
 import { test, expect } from "@playwright/test";
+import { LoginPage } from "../pages/LoginPage.js";
+import { InventoryPage } from "../pages/InventoryPage.js";
 
-test("remove product to shopping cart", async ({ page }) => {
-  await page.goto("https://www.saucedemo.com/");
-  await page.locator("#user-name").fill("standard_user");
-  await page.locator("#password").fill("secret_sauce");
-  await expect(page.locator("#user-name")).toHaveValue("standard_user");
-  await expect(page.locator("#password")).toHaveValue("secret_sauce");
+test("remove product from shopping cart", async ({ page }) => {
+  const loginPage = new LoginPage(page);
 
-  await page.getByRole("button", { name: "Login" }).click();
+  await loginPage.open();
+  await loginPage.login("standard_user", "secret_sauce");
 
   await expect(page).toHaveURL("https://www.saucedemo.com/inventory.html");
   await expect(page.locator('[data-test="title"]')).toBeVisible();
@@ -16,7 +15,8 @@ test("remove product to shopping cart", async ({ page }) => {
     page.getByText("Sauce Labs Backpack", { exact: true }),
   ).toBeVisible();
 
-  await page.locator('[data-test="add-to-cart-sauce-labs-backpack"]').click();
+  const inventoryPage = new InventoryPage(page);
+  await inventoryPage.addProductToCart("Sauce Labs Backpack");
 
   await expect(page.locator(".shopping_cart_badge")).toBeVisible();
   await expect(page.locator(".shopping_cart_badge")).toHaveText("1");
@@ -25,7 +25,7 @@ test("remove product to shopping cart", async ({ page }) => {
     page.locator('[data-test="remove-sauce-labs-backpack"]'),
   ).toBeVisible();
 
-  await page.locator('[data-test="remove-sauce-labs-backpack"]').click();
+  await inventoryPage.removeProductFromCart("Sauce Labs Backpack");
 
   await expect(page.locator(".shopping_cart_badge")).toBeHidden();
   await expect(
