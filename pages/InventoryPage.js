@@ -6,6 +6,10 @@ export class InventoryPage {
   async openCart() {
     await this.page.locator(".shopping_cart_link").click();
   }
+
+  async openProductDetails(productName) {
+    await this.page.getByText(productName, { exact: true }).click();
+  }
   async addProductToCart(productName) {
     const productLocator = productName.toLowerCase().replaceAll(" ", "-");
     await this.page
@@ -16,5 +20,12 @@ export class InventoryPage {
   async removeProductFromCart(productName) {
     const productLocator = productName.toLowerCase().replaceAll(" ", "-");
     await this.page.locator(`[data-test="remove-${productLocator}"]`).click();
+  }
+
+  async continueShopping() {
+    await this.page.locator("#continue-shopping").click();
+  }
+  async backToProducts() {
+    await this.page.locator("#back-to-products").click();
   }
 }

@@ -1,13 +1,13 @@
 import { test, expect } from "@playwright/test";
+import { LoginPage } from "../pages/LoginPage.js";
+import { InventoryPage } from "../pages/InventoryPage.js";
 
 test("verify Sauce Labs Backpack product details", async ({ page }) => {
-  await page.goto("https://www.saucedemo.com/");
-  await page.locator("#user-name").fill("standard_user");
-  await page.locator("#password").fill("secret_sauce");
-  await expect(page.locator("#user-name")).toHaveValue("standard_user");
-  await expect(page.locator("#password")).toHaveValue("secret_sauce");
+  const loginPage = new LoginPage(page);
+  const inventoryPage = new InventoryPage(page);
 
-  await page.getByRole("button", { name: "Login" }).click();
+  await loginPage.open();
+  await loginPage.login("standard_user", "secret_sauce");
 
   await expect(page).toHaveURL("https://www.saucedemo.com/inventory.html");
   await expect(page.locator('[data-test="title"]')).toBeVisible();
@@ -16,7 +16,7 @@ test("verify Sauce Labs Backpack product details", async ({ page }) => {
   const itemName = page.getByText("Sauce Labs Backpack", { exact: true });
   await expect(itemName).toBeVisible();
 
-  await itemName.click();
+  await inventoryPage.openProductDetails("Sauce Labs Backpack");
 
   await expect(page).toHaveURL(
     "https://www.saucedemo.com/inventory-item.html?id=4",

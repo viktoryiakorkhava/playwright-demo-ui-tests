@@ -1,7 +1,9 @@
 import { test, expect } from "@playwright/test";
+import { LoginPage } from "../pages/LoginPage.js";
 
 test("login page verification", async ({ page }) => {
-  await page.goto("https://www.saucedemo.com/");
+  const loginPage = new LoginPage(page);
+  await loginPage.open();
 
   await expect(page).toHaveTitle("Swag Labs");
   await expect(page.locator("#user-name")).toBeVisible();
