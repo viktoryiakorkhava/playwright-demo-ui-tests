@@ -12,6 +12,6 @@ test("Login with a Locked-Out User", async ({ page }) => {
   await expect(errorMessage).toHaveText(
     "Epic sadface: Sorry, this user has been locked out.",
   );
-  await expect(page).toHaveURL("https://www.saucedemo.com/");
+  await expect(page).toHaveURL("/");
   await expect(page.getByRole("button", { name: "Login" })).toBeVisible();
 });

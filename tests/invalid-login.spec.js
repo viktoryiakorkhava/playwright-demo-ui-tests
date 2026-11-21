@@ -11,6 +11,6 @@ test("invalid login verification", async ({ page }) => {
   await expect(page.locator('[data-test="error"]')).toHaveText(
     "Epic sadface: Username and password do not match any user in this service",
   );
-  await expect(page).toHaveURL("https://www.saucedemo.com/");
+  await expect(page).toHaveURL("/");
   await expect(page.getByRole("button", { name: "Login" })).toBeVisible();
 });

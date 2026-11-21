@@ -21,10 +21,6 @@ export class InventoryPage {
     const productLocator = productName.toLowerCase().replaceAll(" ", "-");
     await this.page.locator(`[data-test="remove-${productLocator}"]`).click();
   }
-
-  async continueShopping() {
-    await this.page.locator("#continue-shopping").click();
-  }
   async backToProducts() {
     await this.page.locator("#back-to-products").click();
   }
