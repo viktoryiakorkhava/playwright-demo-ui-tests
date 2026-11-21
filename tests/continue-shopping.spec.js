@@ -1,22 +1,23 @@
 import { test, expect } from "@playwright/test";
-import { LoginPage } from "../pages/LoginPage.js";
+import { CartPage } from "../pages/CartPage.js";
 import { InventoryPage } from "../pages/InventoryPage.js";
+import { signIn } from "./helpers/auth.js";
+import { standardUser } from "./data/users.js";
+import { backpack } from "./data/products.js";
 
 test("Verify Continue Shopping Button", async ({ page }) => {
-  const loginPage = new LoginPage(page);
+  const cartPage = new CartPage(page);
   const inventoryPage = new InventoryPage(page);
 
-  await loginPage.open();
-  await loginPage.login("standard_user", "secret_sauce");
+  await signIn(page, standardUser);
 
-  await expect(page).toHaveURL("https://www.saucedemo.com/inventory.html");
   await expect(page.locator('[data-test="title"]')).toBeVisible();
   await expect(page.locator('[data-test="title"]')).toHaveText("Products");
   await expect(
-    page.getByText("Sauce Labs Backpack", { exact: true }),
+    page.getByText(backpack.name, { exact: true }),
   ).toBeVisible();
 
-  await inventoryPage.addProductToCart("Sauce Labs Backpack");
+  await inventoryPage.addProductToCart(backpack.name);
 
   const shoppingCartBadge = page.locator(".shopping_cart_badge");
   await expect(shoppingCartBadge).toBeVisible();
@@ -24,13 +25,13 @@ test("Verify Continue Shopping Button", async ({ page }) => {
 
   await inventoryPage.openCart();
 
-  await expect(page).toHaveURL("https://www.saucedemo.com/cart.html");
+  await expect(page).toHaveURL("/cart.html");
   await expect(page.locator('[data-test="title"]')).toHaveText("Your Cart");
 
   await expect(page.locator("#continue-shopping")).toBeVisible();
-  await inventoryPage.continueShopping();
+  await cartPage.continueShopping();
 
-  await expect(page).toHaveURL("https://www.saucedemo.com/inventory.html");
+  await expect(page).toHaveURL("/inventory.html");
   await expect(page.locator('[data-test="title"]')).toBeVisible();
   await expect(page.locator('[data-test="title"]')).toHaveText("Products");
   await expect(page.locator('[data-test="inventory-item"]')).toHaveCount(6);

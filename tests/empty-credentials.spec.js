@@ -10,6 +10,6 @@ test("Login with Empty Credentials", async ({ page }) => {
   const errorMessage = page.locator('[data-test="error"]');
   await expect(errorMessage).toBeVisible();
   await expect(errorMessage).toHaveText("Epic sadface: Username is required");
-  await expect(page).toHaveURL("https://www.saucedemo.com/");
+  await expect(page).toHaveURL("/");
   await expect(page.getByRole("button", { name: "Login" })).toBeVisible();
 });

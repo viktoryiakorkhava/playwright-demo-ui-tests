@@ -6,7 +6,7 @@ test("login with valid credentials", async ({ page }) => {
   await loginPage.open();
   await loginPage.login("standard_user", "secret_sauce");
 
-  await expect(page).toHaveURL("https://www.saucedemo.com/inventory.html");
+  await expect(page).toHaveURL("/inventory.html");
   await expect(page.locator('[data-test="title"]')).toBeVisible();
   await expect(page.locator('[data-test="title"]')).toHaveText("Products");
 });

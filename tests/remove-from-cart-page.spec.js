@@ -1,22 +1,21 @@
 import { test, expect } from "@playwright/test";
-import { LoginPage } from "../pages/LoginPage.js";
 import { InventoryPage } from "../pages/InventoryPage.js";
+import { CartPage } from "../pages/CartPage.js";
+import { signIn } from "./helpers/auth.js";
+import { standardUser } from "./data/users.js";
+import { backpack } from "./data/products.js";
 
 test("Remove a Product from the Shopping Cart Page", async ({ page }) => {
-  const loginPage = new LoginPage(page);
   const inventoryPage = new InventoryPage(page);
+  const cartPage = new CartPage(page);
 
-  await loginPage.open();
-  await loginPage.login("standard_user", "secret_sauce");
+  await signIn(page, standardUser);
 
-  await expect(page).toHaveURL("https://www.saucedemo.com/inventory.html");
   await expect(page.locator('[data-test="title"]')).toBeVisible();
   await expect(page.locator('[data-test="title"]')).toHaveText("Products");
-  await expect(
-    page.getByText("Sauce Labs Backpack", { exact: true }),
-  ).toBeVisible();
+  await expect(page.getByText(backpack.name, { exact: true })).toBeVisible();
 
-  await inventoryPage.addProductToCart("Sauce Labs Backpack");
+  await inventoryPage.addProductToCart(backpack.name);
 
   const shoppingCartBadge = page.locator(".shopping_cart_badge");
   await expect(shoppingCartBadge).toBeVisible();
@@ -24,18 +23,15 @@ test("Remove a Product from the Shopping Cart Page", async ({ page }) => {
 
   await inventoryPage.openCart();
 
-  await expect(page).toHaveURL("https://www.saucedemo.com/cart.html");
+  await expect(page).toHaveURL("/cart.html");
   await expect(page.locator('[data-test="title"]')).toHaveText("Your Cart");
-  await expect(
-    page.getByText("Sauce Labs Backpack", { exact: true }),
-  ).toBeVisible();
+  await expect(page.getByText(backpack.name, { exact: true })).toBeVisible();
+  await expect(page.locator(".cart_item")).toHaveCount(1);
   await expect(page.getByRole("button", { name: "Remove" })).toBeVisible();
 
-  await inventoryPage.removeProductFromCart("Sauce Labs Backpack");
+  await cartPage.removeProductFromCart(backpack.name);
 
-  await expect(
-    page.getByText("Sauce Labs Backpack", { exact: true }),
-  ).toHaveCount(0);
-  await expect(page.locator('[data-test="inventory-item"]')).toHaveCount(0);
+  await expect(page.getByText(backpack.name, { exact: true })).toHaveCount(0);
+  await expect(page.locator(".cart_item")).toHaveCount(0);
   await expect(shoppingCartBadge).toBeHidden();
 });
